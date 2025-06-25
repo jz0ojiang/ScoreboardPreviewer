@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scoreboard Previewer</title>
+    <link rel="icon" href="./assets/icon.ico" />
+    <script defer src="./assets/alpine.js"></script>
+    <link rel="stylesheet" href="./assets/style.css" />
+  </head>
+  <body>
+    <div x-data="global">
+      <!-- Loading 状态 -->
+      <div x-show="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <div>解析中...</div>
+      </div>
+
+      <!-- 错误提示 -->
+      <div x-show="error" class="error" x-text="error"></div>
+
+      <!-- 右上角问号按钮（仅在上传区域显示） -->
+      <template x-if="scoreboards.length === 0">
+        <div class="help-btn-wrapper">
+          <div class="help-btn" @mouseenter="showHelp=true; helpHovered=true" @mouseleave="showHelp=false; helpHovered=false">
+            <span>?</span>
+            <div class="help-card" x-show="showHelp" x-transition.opacity @mouseenter="showHelp=true; helpHovered=true" @mouseleave="showHelp=false; helpHovered=false">
+              <div class="help-title">scoreboard.dat 文件位置</div>
+              <div class="help-desc">
+                <div>通常在以下路径：</div>
+                <div class="help-path">.minecraft/versions/<span class="help-em">版本</span>/saves/<span class="help-em">存档</span>/data/scoreboard.dat</div>
+                <div class="help-or">或</div>
+                <div class="help-path">.minecraft/saves/<span class="help-em">存档</span>/data/scoreboard.dat</div>
+                <div class="help-note">请在游戏存档已加载过记分板后查找此文件。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- 主容器 -->
+      <div class="container" x-show="!loading">
+        <!-- 拖拽上传区域 -->
+        <div
+          x-show="scoreboards.length === 0"
+          class="dropfile"
+          :class="{'help-hovered': helpHovered}"
+          @drop.prevent="handleDrop($event)"
+          @dragover.prevent
+          @click="$refs.fileInput.click()"
+        >
+          <div class="dropfile-content">
+            <div class="dropfile-icon">📁</div>
+            <div class="dropfile-text">拖拽文件到此处，或点击选择</div>
+            <div class="dropfile-hint">
+              支持 .dat 格式的 Minecraft 记分板文件
+            </div>
+          </div>
+          <input
+            type="file"
+            x-ref="fileInput"
+            @change="onChange($event)"
+            accept=".dat"
+            style="display: none"
+          />
+        </div>
+
+        <!-- 记分板展示区域 -->
+        <div x-show="scoreboards.length > 0" class="scoreboard-container">
+          <div class="header">
+            <h1 x-text="currentFileName || '记分板预览'"></h1>
+            <button @click="reset()" class="reset-btn">重新选择文件</button>
+          </div>
+
+          <div class="scoreboard-grid">
+            <template x-for="board in scoreboards" :key="board.internal_name">
+              <div class="scoreboard-card">
+                <div class="scoreboard-header">
+                  <h2 x-text="board.display_name"></h2>
+                  <div class="scoreboard-info">
+                    <span class="criteria-name" x-text="board.criteria_name"></span>
+                    <span class="internal-name" x-text="board.internal_name"></span>
+                  </div>
+                </div>
+                <div class="scoreboard-table">
+                  <template x-if="board.data.length > 0">
+                    <div>
+                      <!-- 折叠内容动画（始终显示，只做动画） -->
+                      <div class="collapse-content"
+                           x-transition:enter="collapse-enter"
+                           x-transition:enter-start="collapse-enter-start"
+                           x-transition:enter-end="collapse-enter-end"
+                           x-transition:leave="collapse-leave"
+                           x-transition:leave-start="collapse-leave-start"
+                           x-transition:leave-end="collapse-leave-end"
+                           style="overflow: hidden;">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>名称</th>
+                              <th>分数</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <template x-for="(entry, index) in board.data" :key="entry.Name">
+                              <tr x-show="!board.collapsed || index < 10"
+                                  x-transition:enter="fade-enter"
+                                  x-transition:enter-start="fade-enter-start"
+                                  x-transition:enter-end="fade-enter-end"
+                                  x-transition:leave="fade-leave"
+                                  x-transition:leave-start="fade-leave-start"
+                                  x-transition:leave-end="fade-leave-end">
+                                <td x-text="entry.Name"></td>
+                                <td x-text="entry.Score"></td>
+                              </tr>
+                            </template>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- 折叠/展开控制条 -->
+                      <template x-if="board.data.length > 10">
+                        <div class="collapse-bar"
+                             @click="board.collapsed = !board.collapsed"
+                             :class="{collapsed: board.collapsed}">
+                          <span x-text="board.collapsed ? `展开全部 (${board.data.length}条)` : '收起'"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                  <template x-if="board.data.length === 0">
+                    <div class="no-entries">暂无数据</div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("global", () => ({
+          scoreboards: [],
+          loading: false,
+          error: "",
+          currentFileName: "",
+          showHelp: false,
+          helpHovered: false,
+
+          async handleFile(file) {
+            this.loading = true;
+            this.error = "";
+            this.currentFileName = file.name;
+            
+            try {
+              // 读取文件为 base64
+              const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  // 提取 base64 部分（去掉 data:application/octet-stream;base64, 前缀）
+                  const result = reader.result;
+                  const base64Data = result.split(",")[1];
+                  resolve(base64Data);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+              });
+
+              // 调用 pywebview API
+              const jsonStr = await window.pywebview.api.parse_scoreboard(
+                base64
+              );
+              const response = JSON.parse(jsonStr);
+
+              // 检查是否有错误
+              if (response.error) {
+                throw new Error(response.error);
+              }
+
+              // 新的数据结构是数组，添加折叠状态
+              this.scoreboards = Array.isArray(response) ? response.map(board => ({
+                ...board,
+                collapsed: board.data.length > 10 // 超过10条自动折叠
+              })) : [];
+
+              if (this.scoreboards.length === 0) {
+                this.error = "未找到记分板数据";
+              }
+            } catch (e) {
+              this.error = "解析失败：" + (e.message || e);
+              console.error("Error:", e);
+            } finally {
+              this.loading = false;
+            }
+          },
+
+          handleDrop(event) {
+            const file = event.dataTransfer.files[0];
+            if (file) {
+              this.handleFile(file);
+            }
+          },
+
+          onChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+              this.handleFile(file);
+            }
+          },
+
+          reset() {
+            this.scoreboards = [];
+            this.error = "";
+            this.currentFileName = "";
+            if (this.$refs.fileInput) {
+              this.$refs.fileInput.value = "";
+            }
+          },
+        }));
+      });
+    </script>
+  </body>
+</html>

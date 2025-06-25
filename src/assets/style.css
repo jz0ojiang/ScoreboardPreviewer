@@ -1,0 +1,522 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Loading 状态 */
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 错误提示 */
+.error {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff4757;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    max-width: 90vw;
+    text-align: center;
+}
+
+/* 主容器 */
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 拖拽上传区域 */
+.dropfile {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dropfile:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropfile-content {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 2px dashed #667eea;
+    transition: all 0.3s ease;
+    max-width: 90vw;
+}
+
+.dropfile:hover .dropfile-content {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.dropfile-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.dropfile-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.dropfile-hint {
+    font-size: 0.9rem;
+    color: #666;
+    opacity: 0.8;
+}
+
+/* 记分板展示区域 */
+.scoreboard-container {
+    width: 100%;
+    max-width: 1400px;
+    padding: 1rem 2rem;
+    user-select: text;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 700;
+    word-break: break-all;
+}
+
+.reset-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    margin-left: 1rem;
+}
+
+.reset-btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 记分板网格 */
+.scoreboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* 记分板卡片 */
+.scoreboard-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    user-select: text;
+}
+
+/* 记分板头部 */
+.scoreboard-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #667eea;
+}
+
+.scoreboard-header h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+}
+
+.scoreboard-info {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    flex-wrap: wrap;
+}
+
+.criteria-name {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.internal-name {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    max-width: 100%;
+}
+
+/* 表格样式 */
+.scoreboard-table {
+    overflow-x: auto;
+    user-select: text;
+}
+
+.scoreboard-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.scoreboard-table th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 0.75rem 0.5rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.scoreboard-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #f1f3f4;
+    color: #333;
+}
+
+.scoreboard-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* 折叠控制 */
+.collapse-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8f9fa;
+    color: #495057;
+    font-size: 0.95rem;
+    padding: 0.7rem 0;
+    cursor: pointer;
+    border-radius: 0 0 8px 8px;
+    border-top: 1px solid #dee2e6;
+    transition: background 0.2s, color 0.2s;
+    margin-top: -2px;
+    font-weight: 500;
+    user-select: none;
+}
+
+.collapse-bar:hover {
+    background: #e9ecef;
+    color: #1976d2;
+}
+
+.collapse-bar.collapsed {
+    border-radius: 0 0 8px 8px;
+}
+
+.collapse-content {
+    will-change: max-height, opacity;
+    transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s;
+    overflow: hidden;
+}
+
+.collapse-enter { }
+.collapse-enter-start { max-height: 0; opacity: 0; }
+.collapse-enter-end { max-height: 1000px; opacity: 1; }
+.collapse-leave { }
+.collapse-leave-start { max-height: 1000px; opacity: 1; }
+.collapse-leave-end { max-height: 0; opacity: 0; }
+
+/* 暂无数据样式 */
+.no-entries {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .dropfile-content {
+        padding: 2rem;
+        margin: 1rem;
+    }
+    
+    .dropfile-text {
+        font-size: 1.2rem;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .reset-btn {
+        margin-left: 0;
+    }
+    
+    .scoreboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .scoreboard-container {
+        padding: 1rem;
+    }
+    
+    .scoreboard-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .criteria-name,
+    .internal-name {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .dropfile-content {
+        padding: 1.5rem;
+    }
+    
+    .dropfile-icon {
+        font-size: 3rem;
+    }
+    
+    .dropfile-text {
+        font-size: 1rem;
+    }
+    
+    .scoreboard-card {
+        padding: 1rem;
+    }
+    
+    .scoreboard-table {
+        font-size: 0.8rem;
+    }
+    
+    .header h1 {
+        font-size: 1.2rem;
+    }
+}
+
+/* 滚动条样式 */
+.scoreboard-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scoreboard-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.scoreboard-grid::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 4px;
+}
+
+.scoreboard-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.7);
+}
+
+.fade-enter { }
+.fade-enter-start { opacity: 0; }
+.fade-enter-end { opacity: 1; }
+.fade-leave { }
+.fade-leave-start { opacity: 1; }
+.fade-leave-end { opacity: 0; }
+
+.help-btn-wrapper {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    z-index: 1100;
+}
+.help-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: #667eea;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+    cursor: default;
+    transition: background 0.2s;
+}
+.help-btn:hover {
+    background: #5a6fd8;
+}
+.help-card {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    width: 40vw;
+    min-width: 320px;
+    max-width: 600px;
+    background: #fff;
+    color: #333;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(102,126,234,0.18);
+    padding: 1.5rem 2rem;
+    font-size: 1.08rem;
+    line-height: 1.8;
+    white-space: pre-line;
+    z-index: 1200;
+    opacity: 0;
+    pointer-events: none;
+    cursor: default;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+    transform: scale(0.98) translateY(-8px);
+}
+.help-btn:hover .help-card,
+.help-card[x-show="showHelp"] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+}
+.help-title {
+    font-weight: bold;
+    margin-bottom: 0.7rem;
+    color: #667eea;
+    font-size: 1.13rem;
+}
+.help-desc {
+    font-size: 1.04rem;
+    color: #444;
+    line-height: 1.8;
+}
+.help-path {
+    margin: 0.2em 0 0.2em 0.5em;
+    font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+    background: #f5f7fa;
+    border-radius: 6px;
+    padding: 0.18em 0.5em;
+    display: inline-block;
+    font-size: 0.98em;
+}
+.help-or {
+    color: #888;
+    font-size: 0.97em;
+    margin: 0.1em 0 0.1em 0.5em;
+}
+.help-em {
+    color: #667eea;
+    font-weight: bold;
+}
+.help-note {
+    margin-top: 0.7em;
+    color: #b07d1a;
+    font-size: 0.97em;
+    font-style: italic;
+}
+
+/* 禁用上传区域hover效果 */
+.dropfile.help-hovered:hover {
+    background: rgba(255, 255, 255, 0);
+}
+.dropfile.help-hovered:hover .dropfile-content {
+    transform: translateY(0);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 600px) {
+    .help-btn-wrapper {
+        top: 12px;
+        right: 12px;
+    }
+    .help-card {
+        width: 90vw;
+        min-width: 180px;
+        max-width: 90vw;
+        padding: 1rem 1.1rem;
+        font-size: 0.97rem;
+    }
+}
