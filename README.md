@@ -40,8 +40,13 @@ python app.py
 
 目前已测试过的版本：
 
-- [x] 1.20.5
+- [x] 1.21.5
+- [x] 1.20
 - [x] 1.19.2
+- [x] 1.16.5
+- [x] 1.13.2
+- [x] 1.12.2
+- [x] 1.12
 
 如需支持其他版本，请在 [issues](https://github.com/jz0ojiang/ScoreboardPreviewer/issues) 中提出。
 
