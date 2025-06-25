@@ -10,10 +10,10 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.10] # 可按需改成多个版本，如 [3.8, 3.9, 3.10]
+        python-version: ["3.10"] # 可按需改成多个版本，如 [3.8, 3.9, 3.10]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
